@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="static/style.css">
+  </head>
+  <body>
+    <script src="static/script.js"></script>
+    <div class="title">
+      <br>
+      <h1 style="text-align: center;">Calculate GBP - PLN price </h1>
+      <h2 style="text-align: center;" id="header_price"></h2>
+    </div>
+<div class="input-container">
+  <label class="amount">Amount of GBP:</label>
+  <div class="input-group">
+    <label data-domain="GBP">
+      <input type="number" id="GBPinput" class="icon2" value placeholder="0.00" oninput="showPLN()">
+    </label>
+  </div>
+  <br>
+  <label class="amount">Amount of PLN:</label>
+  <div class="input-group">
+    <label data-domain="PLN">
+      <input type="number" id="PLNinput" class="icon" value placeholder="0.00" oninput="showGBP()">
+    </label>
+  </div>
+</div>
+  </body>
+</html>
