@@ -22,6 +22,7 @@ git clone https://github.com/13Dominik/currency-app.git
 cd currency-app
 pip3 install -r requirements.txt
 export FLASK_APP=main
+sudo apt install python3-flask
 flask run
 ```
 - Git (Windows)
