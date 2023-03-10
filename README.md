@@ -35,7 +35,7 @@ flask run
 ```
 - Docker
 ```docker
-docker run -p 5000:5000 dtomalczyk13/flask-curr:1.0
+docker run -p 5000:5000 dtomalczyk13/flask-curr:1.1
 ``` 
 And then visit: http://127.0.0.1:5000/
 
