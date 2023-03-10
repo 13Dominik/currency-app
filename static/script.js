@@ -3,9 +3,9 @@ window.onload = function () {
 };
 
 let globalGBP;
-
+let globalLastUpdate;
 function init() {
-    getGBPprice();
+    getGBPpriceWithRetry();
     document.getElementById("GBPinput").setAttribute('value', 0.00);
     document.getElementById("PLNinput").setAttribute('value', 0.00);
     showTodaysPrice();
@@ -36,19 +36,40 @@ async function showGBP() {
  */
 async function showTodaysPrice() {
     var element = document.getElementById("header_price");
-    await getGBPprice();
+    await getGBPpriceWithRetry();
     const gbp_price = globalGBP;
+    if (gbp_price === null) { // problem with API occured
+        element.innerHTML = `Problem with API no data.`;
+    }
+    else {
     const gbp_price_rounded = gbp_price.toFixed(2);
-    element.innerHTML = `Today's GBP price: ${gbp_price_rounded} PLN`;
+    element.innerHTML = `Last update (${globalLastUpdate}) GBP price: ${gbp_price_rounded} PLN`;
+    }
 }
-
-async function getGBPprice() {
+/**
+ * Funtion try to fetch data from NBP API <retryCount> number of times, if it does not work globalGBP value is
+ * being set for null and problem with API is announced in showTodaysPrice function.
+ */
+async function getGBPpriceWithRetry(retryCount = 3) {
+  try {
     const response = await axios.get('https://api.nbp.pl/api/exchangerates/rates/a/gbp/');
-    globalGBP = response.data.rates[0].mid;
+    globalGBP = response.data.rates[0].mid; // price of GBP
+    globalLastUpdate = response.data.rates[0].effectiveDate; // last price update date
+  } catch (error) {
+    console.error(error);
+    if (retryCount > 0) {
+      console.log(`Retrying... (${retryCount} attempts left)`);
+      return await getGBPpriceWithRetry(retryCount - 1);
+    } else {
+      console.log('Maximum retry attempts reached, returning default value...');
+      globalGBP = null;
+      globalLastUpdate = null;
+    }
+  }
 }
 
 // Sending request at start, every 2 hours and every day at 12:20
-setInterval(getGBPprice, 7200000); // send every 2 hours
+setInterval(getGBPpriceWithRetry, 7200000); // send every 2 hours
 
 // send everyday at 12.20 pm
 setInterval(() => {
@@ -61,6 +82,6 @@ setInterval(() => {
         timeTill1220 = desiredTime.getTime() - now.getTime();
     }
     setTimeout(() => {
-        getGBPprice(); // function to call after timeTill1220 [ms]
+        getGBPpriceWithRetry(); // function to call after timeTill1220 [ms]
     }, timeTill1220); // time left to call getGBPprice
 }, 86400000); // call it interval every 24 hours
